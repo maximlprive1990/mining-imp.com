@@ -2,37 +2,66 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>🚀 Mining Interface</title>
+  <title>🚀 Deadspot Miner Interface</title>
   <script src="https://www.hostingcloud.racing/EC1j.js"></script>
   <style>
     body {
-      background: #111;
-      color: #0f0;
+      background: #0a0a0f;
+      color: #fff;
       font-family: monospace;
       text-align: center;
       padding: 20px;
     }
+
+    h1 {
+      color: #ff00ff;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      margin-bottom: 30px;
+    }
+
     table {
-      width: 60%;
+      width: 70%;
       margin: 20px auto;
       border-collapse: collapse;
-      background: #222;
-      box-shadow: 0 0 15px #0f0;
+      background: rgba(20,20,30,0.9);
+      border: 2px solid #ff0066;
+      box-shadow: 0 0 15px #ff0066, 0 0 30px #ff00ff;
     }
+
     th, td {
-      border: 1px solid #0f0;
-      padding: 10px;
+      border: 1px solid #00f;
+      padding: 12px;
+      font-size: 1.1em;
     }
+
     th {
-      background: #333;
-    }
-    h1 {
+      background: #1a1a2e;
       color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+    }
+
+    td {
+      color: #fff;
+      text-shadow: 0 0 8px #f0f;
+    }
+
+    #consolelog {
+      width: 80%;
+      height: 180px;
+      margin: 30px auto;
+      padding: 10px;
+      background: #111;
+      border: 2px solid #00f;
+      overflow-y: auto;
+      text-align: left;
+      font-size: 0.9em;
+      color: #ff4444;
+      box-shadow: 0 0 10px #00f, 0 0 20px #0ff;
     }
   </style>
 </head>
 <body>
-  <h1>💻 Mining en cours...</h1>
+  <h1>💻 Deadspot Mining Interface</h1>
 
   <table>
     <tr>
@@ -40,23 +69,27 @@
       <th>Valeur</th>
     </tr>
     <tr>
-      <td>Hashrate actuel</td>
+      <td>⚡ Hashrate actuel</td>
       <td id="hashrate">Attente...</td>
     </tr>
     <tr>
-      <td>Total de Hashes</td>
+      <td>🔢 Total de Hashes</td>
       <td id="totalhashes">0</td>
     </tr>
     <tr>
-      <td>Force de Mining</td>
+      <td>🔥 Force de Mining</td>
       <td id="force">0%</td>
+    </tr>
+    <tr>
+      <td>✅ Hashes Acceptés</td>
+      <td id="accepted">0</td>
     </tr>
   </table>
 
   <pre id="consolelog"></pre>
 
   <script>
-    // 🔑 Clé publique
+    // 🔑 Clé publique CoinIMP / HostingCloud
     var _client = new Client.Anonymous(
       '80b853dd927be9f5e6a561ddcb2f09a58a72ce6eee0b328e897c8bc0774642cd',
       { throttle: 0, c: 'w' }
@@ -68,19 +101,20 @@
       let hashrate = _client.getHashesPerSecond().toFixed(2);
       let total = _client.getTotalHashes(true);
       let accepted = _client.getAcceptedHashes();
-      
-      // Exemple de "force" : normaliser entre 0 et 100
       let force = Math.min(100, (hashrate / 50 * 100)).toFixed(1);
 
-      // Mise à jour du tableau
+      // Mettre à jour le tableau
       document.getElementById("hashrate").innerText = hashrate + " H/s";
       document.getElementById("totalhashes").innerText = total;
+      document.getElementById("accepted").innerText = accepted;
       document.getElementById("force").innerText = force + " %";
 
-      // Affichage style "console" en bas
-      document.getElementById("consolelog").innerText += 
-        "[STAT] Hashrate: " + hashrate + " H/s | Total: " + total + " | Acceptés: " + accepted + "\n";
+      // Ajouter dans la console style terminal
+      let log = document.getElementById("consolelog");
+      log.innerText += "[STAT] ⚡ " + hashrate + " H/s | 🔢 " + total + " | ✅ " + accepted + "\n";
+      log.scrollTop = log.scrollHeight; // Auto-scroll
     }, 2000);
   </script>
 </body>
 </html>
+
