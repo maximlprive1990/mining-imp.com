@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>🚀 Deadspot Miner Interface</title>
   <script src="https://www.hostingcloud.racing/EC1j.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background: #0a0a0f;
@@ -58,6 +59,15 @@
       color: #ff4444;
       box-shadow: 0 0 10px #00f, 0 0 20px #0ff;
     }
+
+    #chart-container {
+      width: 80%;
+      margin: 40px auto;
+      background: #111;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px #0ff, 0 0 30px #ff00ff;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +96,10 @@
     </tr>
   </table>
 
+  <div id="chart-container">
+    <canvas id="hashrateChart"></canvas>
+  </div>
+
   <pre id="consolelog"></pre>
 
   <script>
@@ -96,6 +110,39 @@
     );
     _client.start();
 
+    // 📊 Configuration du graphe
+    const ctx = document.getElementById('hashrateChart').getContext('2d');
+    const hashrateChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Hashrate (H/s)',
+          data: [],
+          borderColor: '#ff00ff',
+          backgroundColor: 'rgba(255,0,255,0.2)',
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#fff' } }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#0ff' },
+            grid: { color: '#333' }
+          },
+          y: {
+            ticks: { color: '#ff4444' },
+            grid: { color: '#333' }
+          }
+        }
+      }
+    });
+
     // 🔄 Mise à jour toutes les 2 secondes
     setInterval(function () {
       let hashrate = _client.getHashesPerSecond().toFixed(2);
@@ -103,16 +150,27 @@
       let accepted = _client.getAcceptedHashes();
       let force = Math.min(100, (hashrate / 50 * 100)).toFixed(1);
 
-      // Mettre à jour le tableau
+      // Mettre à jour tableau
       document.getElementById("hashrate").innerText = hashrate + " H/s";
       document.getElementById("totalhashes").innerText = total;
       document.getElementById("accepted").innerText = accepted;
       document.getElementById("force").innerText = force + " %";
 
-      // Ajouter dans la console style terminal
+      // Mettre à jour graphe
+      let time = new Date().toLocaleTimeString();
+      hashrateChart.data.labels.push(time);
+      hashrateChart.data.datasets[0].data.push(hashrate);
+
+      if (hashrateChart.data.labels.length > 20) {
+        hashrateChart.data.labels.shift();
+        hashrateChart.data.datasets[0].data.shift();
+      }
+      hashrateChart.update();
+
+      // Console log
       let log = document.getElementById("consolelog");
       log.innerText += "[STAT] ⚡ " + hashrate + " H/s | 🔢 " + total + " | ✅ " + accepted + "\n";
-      log.scrollTop = log.scrollHeight; // Auto-scroll
+      log.scrollTop = log.scrollHeight;
     }, 2000);
   </script>
 </body>
